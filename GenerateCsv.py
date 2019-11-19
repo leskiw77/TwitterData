@@ -1,16 +1,18 @@
 from pymongo import MongoClient
 
-examination_id = 11
+examination_id = 1
 client = MongoClient()
 
 db = client.twitterData
 
 users = db.twitterUsers
 
-processed_users = users = users.find({"examination_id": 1, "followers_processed": True})
+print("Query starts")
+processed_users = users = users.find({"examination_id": examination_id, "followers_processed": True})
+print("Query ends")
 
 i = 1
-with open("processed_users.csv", "x") as f:
+with open("processed_users.csv", "w") as f:
     for u in processed_users:
         i += 1
         if i % 1000 == 0:

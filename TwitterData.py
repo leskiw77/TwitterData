@@ -44,11 +44,6 @@ def rec(screen_name):
     updated = {"followers_id": followers_id, "followers_processed": True}
     users.update_one({"examination_id": examination_id, "screen_name": screen_name}, {"$set": updated})
 
-    print("Filtered followers: {}".format(filtered_followers))
-    for follower in filtered_followers:
-        print("start new call for follower {}".format(follower))
-        rec(follower)
-
 
 def insert_user_to_db(follower):
     follower_to_db = {"screen_name": follower,
@@ -59,26 +54,11 @@ def insert_user_to_db(follower):
     return users.insert_one(follower_to_db)
 
 
-# first_followers = get_followers("KaczynskiJaro")
-
-# start = "KaczynskiJaro"
-# start = "jerzykozlowski3"
-# start = "zbigniewajchler"
-# start = "AMAdamczyk"
-# start = "Andruszkiewicz1"
-# start = "JkmMikke"
-# start = "barbaraanowacka"
-# start = "R_A_Ziemkiewicz"
-# start = "CzeslawGluza"
-# start = "OstrowskiArtur"
-# start = "CichonJanusz"
-# start = "HenrykSmolarz"
-# start = "Adam_Rybakowicz"
-# rec(start)
-
-
-many_users = users.find({"examination_id": examination_id, "followers_processed": False})
-user = random.choice([user for user in many_users])
-start = user['screen_name']
-
-rec(start)
+while True:
+    try:
+        user = users.find_one({"examination_id": examination_id, "followers_processed": False, "followers_lock": False})
+        users.update_one({"_id": user["_id"]}, {"$set": {"followers_lock": True}})
+        start = user['screen_name']
+        rec(start)
+    except Exception as e:
+        print("Exception: {}".format(e))
